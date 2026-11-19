@@ -1,0 +1,1031 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>독도의 이름 — EAST SEA WAVE</title>
+  <link rel="preconnect" href="https://cdn.jsdelivr.net" />
+  <link href="https://cdn.jsdelivr.net/gh/orioncactus/pretendard@v1.3.9/dist/web/static/pretendard.min.css" rel="stylesheet" />
+  <style>
+    :root {
+      --bg-dark: #060d18;
+      --bg-card: rgba(11, 22, 38, 0.72);
+      --border-glass: rgba(255, 255, 255, 0.12);
+      --text-main: #f8fafc;
+      --text-muted: #94a3b8;
+      --accent-sea: #38bdf8;
+      --accent-gold: #f59e0b;
+      --accent-glow: rgba(56, 189, 248, 0.35);
+    }
+
+    * {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+    }
+
+    body {
+      font-family: 'Pretendard', -apple-system, BlinkMacSystemFont, sans-serif;
+      background-color: var(--bg-dark);
+      color: var(--text-main);
+      min-height: 100vh;
+      overflow-x: hidden;
+      display: flex;
+      flex-direction: column;
+      position: relative;
+    }
+
+    /* 커버 이미지 기반 은은한 배경 블러 + 오로라 */
+    .ambient-bg {
+      position: fixed;
+      inset: 0;
+      z-index: -2;
+      overflow: hidden;
+      pointer-events: none;
+    }
+
+    .cover-backdrop {
+      position: absolute;
+      inset: -40px;
+      background-image: url('./cover.jpg');
+      background-size: cover;
+      background-position: center;
+      filter: blur(55px) saturate(1.25) brightness(0.32);
+      transform: scale(1.08);
+      transition: background-image 0.5s ease;
+    }
+
+    .ambient-overlay {
+      position: absolute;
+      inset: 0;
+      background: radial-gradient(circle at 18% 20%, rgba(245, 158, 11, 0.16), transparent 45%),
+                  radial-gradient(circle at 82% 80%, rgba(14, 165, 233, 0.22), transparent 50%),
+                  linear-gradient(180deg, rgba(6, 13, 24, 0.45) 0%, rgba(6, 13, 24, 0.88) 100%);
+    }
+
+    /* 헤더 */
+    header {
+      width: 100%;
+      max-width: 1180px;
+      margin: 0 auto;
+      padding: 24px 24px 12px;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      gap: 16px;
+      flex-wrap: wrap;
+    }
+
+    .logo {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      font-weight: 800;
+      font-size: 1.15rem;
+      letter-spacing: -0.02em;
+    }
+
+    .logo-dot {
+      width: 12px;
+      height: 12px;
+      border-radius: 50%;
+      background: linear-gradient(135deg, var(--accent-gold), var(--accent-sea));
+      box-shadow: 0 0 14px rgba(56, 189, 248, 0.6);
+    }
+
+    .header-actions {
+      display: flex;
+      gap: 10px;
+      flex-wrap: wrap;
+    }
+
+    .upload-btn {
+      display: inline-flex;
+      align-items: center;
+      gap: 7px;
+      background: rgba(255, 255, 255, 0.08);
+      border: 1px solid rgba(255, 255, 255, 0.16);
+      color: var(--text-main);
+      padding: 8px 14px;
+      border-radius: 999px;
+      font-size: 0.84rem;
+      font-weight: 600;
+      cursor: pointer;
+      transition: all 0.2s ease;
+    }
+
+    .upload-btn:hover {
+      background: rgba(56, 189, 248, 0.18);
+      border-color: rgba(56, 189, 248, 0.45);
+      color: #fff;
+      transform: translateY(-1px);
+    }
+
+    /* 메인 레이아웃 */
+    main {
+      width: 100%;
+      max-width: 1180px;
+      margin: 0 auto;
+      padding: 20px 24px 48px;
+      display: grid;
+      grid-template-columns: 1.15fr 0.85fr;
+      gap: 24px;
+      flex: 1;
+      align-items: start;
+    }
+
+    .glass-card {
+      background: var(--bg-card);
+      backdrop-filter: blur(24px);
+      -webkit-backdrop-filter: blur(24px);
+      border: 1px solid var(--border-glass);
+      border-radius: 28px;
+      padding: 28px;
+      box-shadow: 0 24px 60px rgba(0, 0, 0, 0.45);
+    }
+
+    /* 왼쪽: 메인 플레이어 */
+    .player-top {
+      display: flex;
+      gap: 24px;
+      align-items: center;
+      margin-bottom: 24px;
+    }
+
+    .cover-wrap {
+      position: relative;
+      width: 185px;
+      height: 185px;
+      flex-shrink: 0;
+      border-radius: 22px;
+      background: linear-gradient(145deg, #f59e0b 0%, #0284c7 55%, #0f172a 100%);
+      box-shadow: 0 18px 42px rgba(0, 0, 0, 0.5);
+      overflow: hidden;
+      cursor: pointer;
+      border: 1px solid rgba(255, 255, 255, 0.18);
+      transition: transform 0.35s ease, box-shadow 0.35s ease;
+    }
+
+    .cover-wrap.playing {
+      box-shadow: 0 18px 46px rgba(56, 189, 248, 0.32), 0 0 24px rgba(245, 158, 11, 0.18);
+    }
+
+    .cover-img {
+      width: 100%;
+      height: 100%;
+      object-fit: cover;
+      display: block;
+      transition: transform 0.6s ease;
+    }
+
+    .cover-wrap.playing .cover-img {
+      transform: scale(1.04);
+    }
+
+    .cover-fallback {
+      position: absolute;
+      inset: 0;
+      display: none;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      text-align: center;
+      padding: 16px;
+      color: #fff;
+      font-weight: 800;
+      font-size: 1.15rem;
+      letter-spacing: -0.02em;
+    }
+
+    .cover-wrap.no-image .cover-img {
+      display: none;
+    }
+
+    .cover-wrap.no-image .cover-fallback {
+      display: flex;
+    }
+
+    .cover-hover-tip {
+      position: absolute;
+      inset: 0;
+      background: rgba(6, 13, 24, 0.55);
+      color: #fff;
+      font-size: 0.78rem;
+      font-weight: 600;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      opacity: 0;
+      transition: opacity 0.2s ease;
+    }
+
+    .cover-wrap:hover .cover-hover-tip {
+      opacity: 1;
+    }
+
+    .track-meta {
+      flex: 1;
+      min-width: 0;
+    }
+
+    .badge {
+      display: inline-block;
+      font-size: 0.74rem;
+      font-weight: 700;
+      letter-spacing: 0.08em;
+      text-transform: uppercase;
+      color: #fde68a;
+      background: rgba(245, 158, 11, 0.16);
+      border: 1px solid rgba(245, 158, 11, 0.3);
+      padding: 4px 10px;
+      border-radius: 999px;
+      margin-bottom: 10px;
+    }
+
+    .track-title {
+      font-size: 1.85rem;
+      font-weight: 800;
+      line-height: 1.25;
+      margin-bottom: 6px;
+      letter-spacing: -0.02em;
+    }
+
+    .track-artist {
+      color: var(--text-muted);
+      font-size: 0.98rem;
+      margin-bottom: 14px;
+    }
+
+    .tags {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 8px;
+    }
+
+    .tag {
+      font-size: 0.78rem;
+      color: #e2e8f0;
+      background: rgba(255, 255, 255, 0.07);
+      border: 1px solid rgba(255, 255, 255, 0.1);
+      padding: 4px 10px;
+      border-radius: 999px;
+    }
+
+    /* 오디오 비주얼라이저 */
+    .visualizer-box {
+      width: 100%;
+      height: 84px;
+      background: rgba(2, 6, 23, 0.45);
+      border: 1px solid rgba(255, 255, 255, 0.07);
+      border-radius: 16px;
+      margin-bottom: 20px;
+      overflow: hidden;
+    }
+
+    #visualizer {
+      width: 100%;
+      height: 100%;
+      display: block;
+    }
+
+    /* 프로그레스 바 */
+    .progress-section {
+      margin-bottom: 20px;
+    }
+
+    .seek-slider {
+      -webkit-appearance: none;
+      appearance: none;
+      width: 100%;
+      height: 6px;
+      border-radius: 999px;
+      background: rgba(255, 255, 255, 0.16);
+      outline: none;
+      cursor: pointer;
+    }
+
+    .seek-slider::-webkit-slider-thumb {
+      -webkit-appearance: none;
+      appearance: none;
+      width: 15px;
+      height: 15px;
+      border-radius: 50%;
+      background: var(--accent-sea);
+      box-shadow: 0 0 12px var(--accent-sea);
+      cursor: pointer;
+      transition: transform 0.15s ease;
+    }
+
+    .seek-slider::-webkit-slider-thumb:hover {
+      transform: scale(1.2);
+    }
+
+    .time-row {
+      display: flex;
+      justify-content: space-between;
+      font-size: 0.8rem;
+      color: var(--text-muted);
+      margin-top: 8px;
+      font-variant-numeric: tabular-nums;
+    }
+
+    /* 컨트롤 버튼 */
+    .controls {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 16px;
+    }
+
+    .main-btns {
+      display: flex;
+      align-items: center;
+      gap: 14px;
+    }
+
+    .icon-btn {
+      background: rgba(255, 255, 255, 0.07);
+      border: 1px solid rgba(255, 255, 255, 0.1);
+      color: var(--text-main);
+      width: 44px;
+      height: 44px;
+      border-radius: 50%;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      cursor: pointer;
+      transition: all 0.2s ease;
+    }
+
+    .icon-btn:hover {
+      background: rgba(255, 255, 255, 0.16);
+      transform: translateY(-1px);
+    }
+
+    .icon-btn.active {
+      color: var(--accent-sea);
+      border-color: rgba(56, 189, 248, 0.5);
+      background: rgba(56, 189, 248, 0.14);
+    }
+
+    .play-btn {
+      width: 62px;
+      height: 62px;
+      border-radius: 50%;
+      border: none;
+      background: linear-gradient(135deg, #0ea5e9 0%, #38bdf8 55%, #f59e0b 100%);
+      color: #fff;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      cursor: pointer;
+      box-shadow: 0 10px 28px var(--accent-glow);
+      transition: transform 0.2s ease, box-shadow 0.2s ease;
+    }
+
+    .play-btn:hover {
+      transform: scale(1.06);
+      box-shadow: 0 14px 36px rgba(56, 189, 248, 0.5);
+    }
+
+    .volume-wrap {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      min-width: 130px;
+    }
+
+    .volume-slider {
+      width: 90px;
+    }
+
+    .status-msg {
+      margin-top: 16px;
+      font-size: 0.84rem;
+      color: #fde68a;
+      background: rgba(245, 158, 11, 0.12);
+      border: 1px solid rgba(245, 158, 11, 0.3);
+      padding: 10px 14px;
+      border-radius: 12px;
+      display: none;
+      line-height: 1.5;
+    }
+
+    .status-msg.show {
+      display: block;
+    }
+
+    /* 플레이리스트 섹션 */
+    .playlist-box {
+      margin-top: 24px;
+      border-top: 1px solid var(--border-glass);
+      padding-top: 20px;
+    }
+
+    .section-title {
+      font-size: 0.9rem;
+      font-weight: 700;
+      color: var(--text-muted);
+      margin-bottom: 12px;
+      text-transform: uppercase;
+      letter-spacing: 0.06em;
+    }
+
+    .playlist-list {
+      list-style: none;
+      display: flex;
+      flex-direction: column;
+      gap: 8px;
+    }
+
+    .playlist-item {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding: 10px 14px;
+      border-radius: 14px;
+      background: rgba(255, 255, 255, 0.04);
+      border: 1px solid transparent;
+      cursor: pointer;
+      transition: all 0.2s ease;
+    }
+
+    .playlist-item:hover {
+      background: rgba(255, 255, 255, 0.09);
+    }
+
+    .playlist-item.active {
+      background: rgba(56, 189, 248, 0.14);
+      border-color: rgba(56, 189, 248, 0.38);
+    }
+
+    .item-left {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+    }
+
+    .item-thumb {
+      width: 42px;
+      height: 42px;
+      border-radius: 10px;
+      object-fit: cover;
+      background: linear-gradient(135deg, #0ea5e9, #f59e0b);
+    }
+
+    .item-title {
+      font-weight: 700;
+      font-size: 0.96rem;
+    }
+
+    .item-sub {
+      font-size: 0.8rem;
+      color: var(--text-muted);
+      margin-top: 2px;
+    }
+
+    /* 오른쪽: 가사 패널 */
+    .lyrics-card {
+      max-height: 690px;
+      display: flex;
+      flex-direction: column;
+    }
+
+    .lyrics-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 16px;
+      padding-bottom: 14px;
+      border-bottom: 1px solid var(--border-glass);
+    }
+
+    .lyrics-scroll {
+      overflow-y: auto;
+      padding-right: 8px;
+      line-height: 1.9;
+      font-size: 0.98rem;
+      color: #cbd5e1;
+    }
+
+    .lyrics-scroll::-webkit-scrollbar {
+      width: 6px;
+    }
+
+    .lyrics-scroll::-webkit-scrollbar-thumb {
+      background: rgba(255, 255, 255, 0.18);
+      border-radius: 999px;
+    }
+
+    .lyric-block {
+      margin-bottom: 22px;
+    }
+
+    .lyric-label {
+      display: inline-block;
+      font-size: 0.72rem;
+      font-weight: 700;
+      color: #fde68a;
+      letter-spacing: 0.08em;
+      margin-bottom: 6px;
+      text-transform: uppercase;
+    }
+
+    .lyric-chorus {
+      color: #ffffff;
+      font-weight: 600;
+      padding-left: 12px;
+      border-left: 3px solid var(--accent-sea);
+    }
+
+    /* 반응형 */
+    @media (max-width: 900px) {
+      main {
+        grid-template-columns: 1fr;
+      }
+      .player-top {
+        flex-direction: column;
+        text-align: center;
+      }
+      .tags {
+        justify-content: center;
+      }
+      .controls {
+        flex-wrap: wrap;
+        justify-content: center;
+      }
+    }
+  </style>
+</head>
+<body>
+  <div class="ambient-bg">
+    <div class="cover-backdrop" id="coverBackdrop"></div>
+    <div class="ambient-overlay"></div>
+  </div>
+
+  <header>
+    <div class="logo">
+      <span class="logo-dot"></span>
+      <span>EAST SEA WAVE</span>
+    </div>
+    <div class="header-actions">
+      <label class="upload-btn" for="localCoverInput">
+        커버 미리보기
+      </label>
+      <label class="upload-btn" for="localFileInput">
+        로컬 음원 재생
+      </label>
+    </div>
+    <input type="file" id="localCoverInput" accept="image/*" hidden />
+    <input type="file" id="localFileInput" accept="audio/*" hidden />
+  </header>
+
+  <main>
+    <!-- 메인 플레이어 카드 -->
+    <section class="glass-card">
+      <div class="player-top">
+        <div class="cover-wrap" id="coverWrap" title="클릭하여 로컬 커버 이미지 미리보기">
+          <img id="coverImg" class="cover-img" src="./cover.jpg" alt="독도의 이름 앨범 커버" />
+          <div class="cover-fallback">
+            <span>독도의 이름</span>
+            <span style="font-size: 0.72rem; font-weight: 500; opacity: 0.8; margin-top: 6px;">cover.jpg 연결 필요</span>
+          </div>
+          <div class="cover-hover-tip">커버 변경</div>
+        </div>
+
+        <div class="track-meta">
+          <span class="badge">OFFICIAL SINGLE</span>
+          <h1 class="track-title" id="trackTitle">독도의 이름</h1>
+          <p class="track-artist" id="trackArtist">East Sea Project · Synth Pop</p>
+          <div class="tags" id="trackTags">
+            <span class="tag">#독도의이름</span>
+            <span class="tag">#천연기념물336호</span>
+            <span class="tag">#동해바다</span>
+          </div>
+        </div>
+      </div>
+
+      <!-- 실시간 비주얼라이저 -->
+      <div class="visualizer-box">
+        <canvas id="visualizer"></canvas>
+      </div>
+
+      <!-- 재생 진행바 -->
+      <div class="progress-section">
+        <input type="range" id="seekSlider" class="seek-slider" value="0" min="0" max="100" step="0.1" />
+        <div class="time-row">
+          <span id="currentTime">0:00</span>
+          <span id="durationTime">0:00</span>
+        </div>
+      </div>
+
+      <!-- 플레이어 컨트롤 -->
+      <div class="controls">
+        <div class="main-btns">
+          <button class="icon-btn" id="prevBtn" title="이전 곡">
+            <svg width="18" height="18" viewBox="0 0 24 24" fill="currentColor">
+              <path d="M6 6h2v12H6zm3.5 6l8.5 6V6z"/>
+            </svg>
+          </button>
+
+          <button class="play-btn" id="playBtn" title="재생 / 일시정지 (Space)">
+            <svg id="playIcon" width="24" height="24" viewBox="0 0 24 24" fill="currentColor">
+              <path d="M8 5v14l11-7z"/>
+            </svg>
+          </button>
+
+          <button class="icon-btn" id="nextBtn" title="다음 곡">
+            <svg width="18" height="18" viewBox="0 0 24 24" fill="currentColor">
+              <path d="M6 18l8.5-6L6 6v12zM16 6v12h2V6h-2z"/>
+            </svg>
+          </button>
+
+          <button class="icon-btn" id="loopBtn" title="한 곡 반복">
+            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+              <polyline points="17 1 21 5 17 9"></polyline>
+              <path d="M3 11V9a4 4 0 0 1 4-4h14"></path>
+              <polyline points="7 23 3 19 7 15"></polyline>
+              <path d="M21 13v2a4 4 0 0 1-4 4H3"></path>
+            </svg>
+          </button>
+        </div>
+
+        <div class="volume-wrap">
+          <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#94a3b8" stroke-width="2">
+            <polygon points="11 5 6 9 2 9 2 15 6 15 11 19 11 5"></polygon>
+            <path d="M15.54 8.46a5 5 0 0 1 0 7.07"></path>
+          </svg>
+          <input type="range" id="volumeSlider" class="seek-slider volume-slider" min="0" max="1" step="0.02" value="0.85" />
+        </div>
+      </div>
+
+      <div class="status-msg" id="statusMsg"></div>
+
+      <!-- 플레이리스트 -->
+      <div class="playlist-box">
+        <div class="section-title">Tracklist</div>
+        <ul class="playlist-list" id="playlistEl"></ul>
+      </div>
+    </section>
+
+    <!-- 가사 카드 -->
+    <aside class="glass-card lyrics-card">
+      <div class="lyrics-header">
+        <div class="section-title" style="margin-bottom: 0;">Lyrics</div>
+        <span style="font-size: 0.8rem; color: var(--text-muted);">독도의 이름 · Full Ver.</span>
+      </div>
+      <div class="lyrics-scroll" id="lyricsContainer"></div>
+    </aside>
+  </main>
+
+  <audio id="audioPlayer" preload="metadata"></audio>
+
+  <script>
+    // 트랙 목록: 깃허브 같은 폴더에 '독도의 이름.mp3'와 'cover.jpg'를 업로드하세요.
+    const PLAYLIST = [
+      {
+        title: "독도의 이름",
+        artist: "East Sea Project · Synth Pop",
+        src: "./독도의 이름.mp3",
+        cover: "./cover.jpg",
+        tags: ["#독도의이름", "#천연기념물336호", "#동해바다"],
+        lyrics: [
+          {
+            label: "Verse 1",
+            lines: [
+              "울릉도 동남쪽 87킬로 대한민국 독도리",
+              "우산봉 동도와 대한봉 서도 여든아홉 섬이 모였네",
+              "화산으로 빚은 최고령 섬 천연기념물 336호",
+              "한류 난류 품은 바다엔 미기록종까지 피어나지"
+            ]
+          },
+          {
+            label: "Chorus",
+            isChorus: true,
+            lines: [
+              "동해바다 한가운데 빛나는 이름 천년을 이어온 대한민국 독도",
+              "거센 파도 부딪혀도 흔들림 없이 오늘도 내일도 당당한 우리의 땅"
+            ]
+          },
+          {
+            label: "Verse 2",
+            lines: [
+              "신라 우산국부터 안용복 대한제국 칙령 41호",
+              "역사와 법이 증명하는 변치 않을 실효지배",
+              "메탄하이드레이트와 황금어장 동해 안보의 눈",
+              "지키는 이들과 370만 발걸음이 함께 숨 쉬네"
+            ]
+          },
+          {
+            label: "Final Chorus",
+            isChorus: true,
+            lines: [
+              "동해바다 한가운데 빛나는 이름 천년을 이어온 대한민국 독도",
+              "역사가 말해주고 바다가 기억하는 영원히 변치 않을 우리의 땅",
+              "독도, 독도!"
+            ]
+          }
+        ]
+      }
+    ];
+
+    const audio = document.getElementById("audioPlayer");
+    const playBtn = document.getElementById("playBtn");
+    const playIcon = document.getElementById("playIcon");
+    const prevBtn = document.getElementById("prevBtn");
+    const nextBtn = document.getElementById("nextBtn");
+    const loopBtn = document.getElementById("loopBtn");
+    const seekSlider = document.getElementById("seekSlider");
+    const volumeSlider = document.getElementById("volumeSlider");
+    const currentTimeEl = document.getElementById("currentTime");
+    const durationTimeEl = document.getElementById("durationTime");
+    const coverWrap = document.getElementById("coverWrap");
+    const coverImg = document.getElementById("coverImg");
+    const coverBackdrop = document.getElementById("coverBackdrop");
+    const statusMsg = document.getElementById("statusMsg");
+    const playlistEl = document.getElementById("playlistEl");
+    const lyricsContainer = document.getElementById("lyricsContainer");
+    const localFileInput = document.getElementById("localFileInput");
+    const localCoverInput = document.getElementById("localCoverInput");
+
+    let currentIndex = 0;
+    let isPlaying = false;
+    let audioCtx = null;
+    let analyser = null;
+    let dataArray = null;
+    let audioSourceConnected = false;
+
+    function formatTime(sec) {
+      if (isNaN(sec) || !isFinite(sec)) return "0:00";
+      const m = Math.floor(sec / 60);
+      const s = Math.floor(sec % 60);
+      return `${m}:${s < 10 ? "0" : ""}${s}`;
+    }
+
+    function showStatus(msg) {
+      statusMsg.textContent = msg;
+      statusMsg.classList.add("show");
+    }
+
+    function hideStatus() {
+      statusMsg.classList.remove("show");
+    }
+
+    function setCoverImage(url) {
+      coverWrap.classList.remove("no-image");
+      coverImg.src = url;
+      coverBackdrop.style.backgroundImage = `url('${url}')`;
+    }
+
+    coverImg.addEventListener("error", () => {
+      coverWrap.classList.add("no-image");
+    });
+
+    coverWrap.addEventListener("click", () => {
+      localCoverInput.click();
+    });
+
+    function loadTrack(index) {
+      currentIndex = index;
+      const track = PLAYLIST[index];
+      document.title = `${track.title} — EAST SEA WAVE`;
+      document.getElementById("trackTitle").textContent = track.title;
+      document.getElementById("trackArtist").textContent = track.artist;
+
+      const tagsEl = document.getElementById("trackTags");
+      tagsEl.innerHTML = track.tags.map(t => `<span class="tag">${t}</span>`).join("");
+
+      setCoverImage(track.cover);
+      audio.src = encodeURI(track.src);
+      seekSlider.value = 0;
+      currentTimeEl.textContent = "0:00";
+      durationTimeEl.textContent = "0:00";
+      hideStatus();
+
+      renderLyrics(track.lyrics);
+      renderPlaylist();
+    }
+
+    function renderLyrics(lyrics) {
+      if (!lyrics || lyrics.length === 0) {
+        lyricsContainer.innerHTML = `<p style="color: var(--text-muted);">등록된 가사가 없습니다.</p>`;
+        return;
+      }
+      lyricsContainer.innerHTML = lyrics.map(block => `
+        <div class="lyric-block">
+          <span class="lyric-label">${block.label}</span>
+          <div class="${block.isChorus ? "lyric-chorus" : ""}">
+            ${block.lines.map(line => `<p>${line}</p>`).join("")}
+          </div>
+        </div>
+      `).join("");
+    }
+
+    function renderPlaylist() {
+      playlistEl.innerHTML = PLAYLIST.map((track, idx) => `
+        <li class="playlist-item ${idx === currentIndex ? "active" : ""}" data-index="${idx}">
+          <div class="item-left">
+            <img class="item-thumb" src="${track.cover}" alt="${track.title}" onerror="this.style.visibility='hidden'" />
+            <div>
+              <div class="item-title">${track.title}</div>
+              <div class="item-sub">${track.artist}</div>
+            </div>
+          </div>
+          <span style="font-size: 0.78rem; font-weight: 700; color: var(--accent-sea);">
+            ${idx === currentIndex && isPlaying ? "PLAYING" : "PLAY"}
+          </span>
+        </li>
+      `).join("");
+
+      document.querySelectorAll(".playlist-item").forEach(item => {
+        item.addEventListener("click", () => {
+          const idx = Number(item.dataset.index);
+          if (idx !== currentIndex) loadTrack(idx);
+          playAudio();
+        });
+      });
+    }
+
+    function initAudioAnalyser() {
+      if (audioSourceConnected) {
+        if (audioCtx && audioCtx.state === "suspended") audioCtx.resume();
+        return;
+      }
+      try {
+        const AudioContextClass = window.AudioContext || window.webkitAudioContext;
+        audioCtx = new AudioContextClass();
+        analyser = audioCtx.createAnalyser();
+        analyser.fftSize = 128;
+        const source = audioCtx.createMediaElementSource(audio);
+        source.connect(analyser);
+        analyser.connect(audioCtx.destination);
+        dataArray = new Uint8Array(analyser.frequencyBinCount);
+        audioSourceConnected = true;
+      } catch (e) {
+        analyser = null;
+      }
+    }
+
+    async function playAudio() {
+      initAudioAnalyser();
+      try {
+        await audio.play();
+        isPlaying = true;
+        updatePlayUI();
+        hideStatus();
+      } catch (err) {
+        isPlaying = false;
+        updatePlayUI();
+        showStatus("음원 파일('독도의 이름.mp3')을 찾지 못했습니다. 같은 폴더에 파일을 넣거나 상단 '로컬 음원 재생' 버튼으로 선택해 주세요.");
+      }
+    }
+
+    function pauseAudio() {
+      audio.pause();
+      isPlaying = false;
+      updatePlayUI();
+    }
+
+    function updatePlayUI() {
+      coverWrap.classList.toggle("playing", isPlaying);
+      playIcon.innerHTML = isPlaying
+        ? '<path d="M6 19h4V5H6v14zm8-14v14h4V5h-4z"/>'
+        : '<path d="M8 5v14l11-7z"/>';
+      renderPlaylist();
+    }
+
+    playBtn.addEventListener("click", () => (isPlaying ? pauseAudio() : playAudio()));
+
+    prevBtn.addEventListener("click", () => {
+      loadTrack((currentIndex - 1 + PLAYLIST.length) % PLAYLIST.length);
+      playAudio();
+    });
+
+    nextBtn.addEventListener("click", () => {
+      loadTrack((currentIndex + 1) % PLAYLIST.length);
+      playAudio();
+    });
+
+    loopBtn.addEventListener("click", () => {
+      audio.loop = !audio.loop;
+      loopBtn.classList.toggle("active", audio.loop);
+    });
+
+    audio.addEventListener("loadedmetadata", () => {
+      durationTimeEl.textContent = formatTime(audio.duration);
+    });
+
+    audio.addEventListener("timeupdate", () => {
+      if (!audio.duration) return;
+      seekSlider.value = (audio.currentTime / audio.duration) * 100;
+      currentTimeEl.textContent = formatTime(audio.currentTime);
+    });
+
+    audio.addEventListener("ended", () => {
+      if (!audio.loop) {
+        if (PLAYLIST.length > 1) {
+          loadTrack((currentIndex + 1) % PLAYLIST.length);
+          playAudio();
+        } else {
+          isPlaying = false;
+          updatePlayUI();
+        }
+      }
+    });
+
+    seekSlider.addEventListener("input", () => {
+      if (!audio.duration) return;
+      audio.currentTime = (seekSlider.value / 100) * audio.duration;
+    });
+
+    volumeSlider.addEventListener("input", () => {
+      audio.volume = volumeSlider.value;
+    });
+    audio.volume = volumeSlider.value;
+
+    window.addEventListener("keydown", (e) => {
+      if (e.code === "Space" && e.target.tagName !== "INPUT") {
+        e.preventDefault();
+        isPlaying ? pauseAudio() : playAudio();
+      }
+    });
+
+    // 로컬 음원 / 커버 미리보기
+    localFileInput.addEventListener("change", (e) => {
+      const file = e.target.files[0];
+      if (!file) return;
+      const objectURL = URL.createObjectURL(file);
+      PLAYLIST[currentIndex].src = objectURL;
+      audio.src = objectURL;
+      playAudio();
+    });
+
+    localCoverInput.addEventListener("change", (e) => {
+      const file = e.target.files[0];
+      if (!file) return;
+      const objectURL = URL.createObjectURL(file);
+      PLAYLIST[currentIndex].cover = objectURL;
+      setCoverImage(objectURL);
+      renderPlaylist();
+    });
+
+    // 캔버스 비주얼라이저 (동해 바다 블루 -> 노을 골드 그라데이션)
+    const canvas = document.getElementById("visualizer");
+    const ctx = canvas.getContext("2d");
+
+    function resizeCanvas() {
+      const dpr = window.devicePixelRatio || 1;
+      canvas.width = canvas.clientWidth * dpr;
+      canvas.height = canvas.clientHeight * dpr;
+      ctx.setTransform(dpr, 0, 0, dpr, 0, 0);
+    }
+    window.addEventListener("resize", resizeCanvas);
+    resizeCanvas();
+
+    let phase = 0;
+    function drawVisualizer() {
+      requestAnimationFrame(drawVisualizer);
+      const w = canvas.clientWidth;
+      const h = canvas.clientHeight;
+      ctx.clearRect(0, 0, w, h);
+
+      const barCount = 44;
+      const gap = 4;
+      const barWidth = (w - gap * (barCount - 1)) / barCount;
+
+      if (analyser && isPlaying) {
+        analyser.getByteFrequencyData(dataArray);
+      }
+
+      const grad = ctx.createLinearGradient(0, h, 0, 0);
+      grad.addColorStop(0, "#0284c7");
+      grad.addColorStop(0.65, "#38bdf8");
+      grad.addColorStop(1, "#fbbf24");
+      ctx.fillStyle = grad;
+
+      phase += 0.08;
+      for (let i = 0; i < barCount; i++) {
+        let value = 0.08;
+        if (isPlaying) {
+          const hasRealData = analyser && dataArray && dataArray.some(v => v > 0);
+          if (hasRealData) {
+            value = Math.max(0.08, dataArray[i] / 255);
+          } else {
+            value = 0.25 + 0.45 * Math.abs(Math.sin(phase + i * 0.35));
+          }
+        }
+        const barHeight = value * (h - 14);
+        const x = i * (barWidth + gap);
+        const y = h - barHeight;
+
+        ctx.beginPath();
+        ctx.roundRect(x, y, barWidth, barHeight, 4);
+        ctx.fill();
+      }
+    }
+
+    loadTrack(0);
+    drawVisualizer();
+  </script>
+</body>
+</html>
